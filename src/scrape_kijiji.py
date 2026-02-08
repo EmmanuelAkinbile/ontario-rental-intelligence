@@ -7,6 +7,7 @@ Designed to produce a point-in-time snapshot of the rental market.
 
 # import all necessary libraries
 import time
+import csv
 import requests 
 from bs4 import BeautifulSoup 
 
@@ -23,6 +24,8 @@ headers = {
 
 base_url = "https://www.kijiji.ca/b-apartments-condos/gta-greater-toronto-area/c37l1700272?msockid=0133c66d12326754043ed03d131d665b"
 max_pages = 100
+
+all_rows = []
 
 for page_num in range(1, max_pages + 1):
 
@@ -58,6 +61,23 @@ for page_num in range(1, max_pages + 1):
 
         bed = card.find("li", attrs= {"aria-label": "Bedrooms"})
         beds = bed.get_text(strip=True) if bed else None
+
+        row = {
+            "title": title,
+            "price_raw": price,
+            "location": location_text,
+            "unit_type": unit_type,
+            "sqft_raw": sqft,
+            "bedrooms_raw": beds,
+            "url": href
+            }
+        all_rows.append(row)
         
-        print(title, " | ", price, " | ", location_text, " | ", unit_type, " | ", sqft, " | ", beds, " | ", href)
     time.sleep(2)
+
+output_file = "kijiji_rentals_gta_raw.csv"
+
+with open(output_file, "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames= all_rows[0].keys())
+    writer.writeheader()
+    writer.writerows(all_rows)
