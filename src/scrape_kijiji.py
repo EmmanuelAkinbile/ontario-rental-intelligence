@@ -9,8 +9,25 @@ Designed to produce a point-in-time snapshot of the rental market.
 import time
 import csv
 import requests 
+import duckdb
 from bs4 import BeautifulSoup 
 
+con = duckdb.connect("ontario_rentals.duckdb")
+
+con.execute("DROP TABLE IF EXISTS rentals_raw;")
+con.execute("""
+            CREATE TABLE IF NOT EXISTS rentals_raw(
+            title TEXT,
+            price_raw TEXT,
+            location TEXT,
+            unit_type TEXT, 
+            sqft_raw TEXT,
+            bedrooms_raw TEXT,
+            url TEXT,
+            scraped_at TIMESTAMP
+            );
+            """)
+con.execute("DELETE FROM rentals_raw;")
 # define url of webpage to scrape from
 url = "https://www.kijiji.ca/b-apartments-condos/gta-greater-toronto-area/c37l1700272?msockid=0133c66d12326754043ed03d131d665b"
 
@@ -75,7 +92,32 @@ for page_num in range(1, max_pages + 1):
         
     time.sleep(2)
 
-output_file = "kijiji_rentals_gta_raw.csv"
+con.executemany(
+    """
+    INSERT INTO rentals_raw
+    (title, price_raw, location, unit_type, sqft_raw, bedrooms_raw, url, scraped_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+    """,
+    [
+        (
+            row["title"],
+            row["price_raw"],
+            row["location"],
+            row["unit_type"],
+            row["sqft_raw"],
+            row["bedrooms_raw"],
+            row["url"],
+        )
+        for row in all_rows
+    ],
+)
+
+result = con.execute("SELECT COUNT(*) FROM rentals_raw").fetchone()
+print("Row count in rentals_raw:", result[0])
+
+con.close()
+
+output_file = "kijiji_rentals_raw.csv"
 
 with open(output_file, "w", newline="", encoding="utf-8") as f:
     writer = csv.DictWriter(f, fieldnames= all_rows[0].keys())
