@@ -1,97 +1,78 @@
 # Ontario Rental Intelligence
 
-Ontario Rental Intelligence is an end-to-end data pipeline that collects, stores, and transforms live Ontario rental housing listings. 
-
-The project focuses on real-world data ingestion, pagination, rate-limited scraping, SQL-based data cleaning, and reproducible snapshot generation to produce an analysis-ready dataset for downstream exploration and visualization.
+An end-to-end data pipeline that collects, cleans, and analyzes live Ontario rental listings to generate market-level housing insights.
 
 ---
 
-## Project Objectives
+## Business Objective
 
-- Build a reliable pipeline for ingesting live rental listings
-- Handle real-world challenges such as pagination and rate limiting
-- Produce a clean, structured dataset suitable for analysis and visualization
-- Emphasize reproducibility and maintainable code structure
+Build a reproducible rental market intelligence pipeline to:
 
----
-
-## Data Source
-
-Rental listings are collected from publicly available online classifieds.  
-The pipeline is designed to adapt to changing listing volumes and page counts.
+- Standardize messy rental listing data
+- Quantify price differences across regions and unit types
+- Derive price-per-square-foot benchmarks
+- Surface inventory mix and bedroom price premiums
+- Produce an analysis-ready dataset for BI dashboards
 
 ---
 
-## Pipeline Overview
+## Key Insights Generated
 
-1. Generate page URLs programmatically  
-2. Request pages using browser-like headers  
-3. Apply rate limiting between page requests  
-4. Parse listing cards from each page  
-5. Store raw listings in DuckDB  
-6. Create a cleaned analytics table using SQL transformations  
-7. Export both raw and cleaned datasets to CSV  
-8. Produce a reproducible point-in-time market snapshot
+Using SQL-based transformations and exploratory analysis:
 
----
-
-## Extracted Fields (Raw Table)
-
-- Listing title  
-- Price (raw text)  
-- Location  
-- Unit type (e.g. apartment, condo, house)  
-- Square footage (when available)  
-- Number of bedrooms  
-- Listing URL  
-
----
-
-## Cleaned Fields (Analytics Table)
-
-- price_monthly (integer, NULL-safe)
-- bedrooms (numeric)
-- sqft (integer)
-- location_clean (standardized text)
-- market_area (Toronto, Peel, York, Durham, Halton, Other)
-- is_duplicate (URL-based deduplication flag)
-- is_low_price_flag (possible non-residential or marketing listing)
-- listing_url
+- Toronto commands the highest median rent and price-per-square-foot
+- Apartments dominate supply in Toronto (~45%), while basements lead in Peel and Durham
+- Price-per-square-foot reveals density-driven premiums in core markets
+- Rent increases non-linearly with bedroom count (clear bedroom premium curve)
+- Inventory mix differs materially across regions, affecting pricing dynamics
 
 ---
 
 ## Tech Stack
 
 - Python (data ingestion)
-- requests
-- BeautifulSoup
-- DuckDB (embedded analytical database)
-- SQL (data cleaning and transformation layer)
+- requests + BeautifulSoup (scraping)
+- DuckDB (analytical storage)
+- SQL (data cleaning & transformation layer)
+- Jupyter Notebook (EDA)
 - GitHub (version control)
+
+---
+
+## Project Structure
+
+/rental_pipeline.py → Data ingestion + storage
+/rental_eda_queries.sql → Analytical SQL queries
+/rental_eda.ipynb → Exploratory analysis + interpretation
+/kijiji_rentals_clean.csv → Clean analytics-ready dataset (snapshot)
+
+---
+
+## Data Flow
+
+Web Pages  
+→ Python Scraper  
+→ DuckDB (Raw Table)  
+→ SQL Transformations  
+→ Clean Table  
+→ CSV Snapshot  
+→ EDA / BI
 
 ---
 
 ## Design Decisions
 
-- Data is captured as a **point-in-time snapshot** rather than appended across runs  
-- Rate limiting is applied to avoid overwhelming the source site  
-- Raw fields are preserved to support flexible downstream transformations  
-- Pagination is handled explicitly to ensure predictable execution
-- Cleaning logic is implemented in SQL to simulate production-style transformation workflows
+- Snapshot-based architecture (point-in-time market view)
+- SQL-driven transformation layer (production-style modeling)
+- Explicit pagination and rate limiting
+- URL-based deduplication
+- Structured anomaly filtering (extreme price flag)
 
 ---
 
-## Future Work
+## Future Enhancements
 
-- Add historical tracking across multiple snapshot runs
-- Implement price-per-square-foot derived metrics
-- Add anomaly detection for extreme listings
-- Build exploratory analysis notebook (EDA)
-- Develop Power BI dashboard for rental market insights
-
----
-
-## Data Flow Architecture
-
-Web Pages → Python Scraper → DuckDB (Raw Table) → SQL Transformations → Clean Table → CSV Export → Analysis / BI
-
+- Historical tracking across multiple snapshots
+- Automated anomaly detection
+- Power BI dashboard
+- Regional trend comparison over time
