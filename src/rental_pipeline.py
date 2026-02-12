@@ -23,6 +23,7 @@ con.execute("""
             unit_type TEXT, 
             sqft_raw TEXT,
             bedrooms_raw TEXT,
+            description TEXT,
             url TEXT,
             scraped_at TIMESTAMP
             );
@@ -80,6 +81,9 @@ for page_num in range(1, max_pages + 1):
         bed = card.find("li", attrs= {"aria-label": "Bedrooms"})
         beds = bed.get_text(strip=True) if bed else None
 
+        desc_tag = card.find("p", attrs={"data-testid": "listing-description"})
+        description = desc_tag.get_text() if desc_tag else None
+
         row = {
             "title": title,
             "price_raw": price,
@@ -87,6 +91,7 @@ for page_num in range(1, max_pages + 1):
             "unit_type": unit_type,
             "sqft_raw": sqft,
             "bedrooms_raw": beds,
+            "description": description,
             "url": href
             }
         all_rows.append(row)
@@ -96,8 +101,8 @@ for page_num in range(1, max_pages + 1):
 con.executemany(
     """
     INSERT INTO rentals_raw
-    (title, price_raw, location, unit_type, sqft_raw, bedrooms_raw, url, scraped_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+    (title, price_raw, location, unit_type, sqft_raw, bedrooms_raw, description, url, scraped_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
     """,
     [
         (
@@ -107,6 +112,7 @@ con.executemany(
             row["unit_type"],
             row["sqft_raw"],
             row["bedrooms_raw"],
+            row["description"],
             row["url"],
         )
         for row in all_rows
@@ -127,10 +133,12 @@ CREATE OR REPLACE TABLE kijiji_rentals_clean AS
         price_monthly,
         bedrooms,
         sqft,
-        unit_type_clean
+        unit_type_clean,
         location_clean,
         market_area,
+        description,
         CASE WHEN price_monthly IS NOT NULL AND price_monthly < 300 THEN 1 ELSE 0 END AS extreme_low_price_flag,
+        scraped_at,
         url
     FROM (
         SELECT
@@ -204,7 +212,67 @@ CREATE OR REPLACE TABLE kijiji_rentals_clean AS
                 -- Anything else that slips through (still useful to keep)
                 ELSE 'Other / Unknown'
                 END AS market_area,
-                NULLIF(TRIM(unit_type), '') AS unit_type_clean,
+                CASE
+                    -- If dropdown unit_type is missing, infer from TITLE + DESCRIPTION (preview)
+                    WHEN unit_type IS NULL OR TRIM(unit_type) = '' THEN
+                        CASE
+                            WHEN (title IS NULL OR TRIM(title) = '')
+                                AND (description IS NULL OR TRIM(description) = '') THEN NULL
+
+                            -- Build combined text once (conceptually)
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(roommate|shared\s+room|private\s+room|room\s+for\s+rent)(\W|$)'
+                            ) THEN 'Room'
+
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(basement|bsmt)(\W|$)'
+                            ) THEN 'Basement'
+
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(duplex|triplex)(\W|$)'
+                            ) THEN 'Duplex/Triplex'
+
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(townhouse|town\s*home)(\W|$)'
+                            ) THEN 'Townhouse'
+
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(condo|condominium|tridel)(\W|$)'
+                            ) THEN 'Condo'
+
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(apartment|apt)(\W|$)'
+                            ) THEN 'Apartment'
+
+                            -- House: keep it stricter so you don't match street names like "Homewood"
+                            WHEN regexp_matches(
+                                LOWER(COALESCE(title,'') || ' ' || COALESCE(description,'')),
+                                '(^|\W)(house\s+for\s+rent|detached|semi[-\s]?detached)(\W|$)'
+                            ) THEN 'House'
+
+                            ELSE NULL
+                        END
+
+                    -- Otherwise trust dropdown and standardize it
+                    ELSE
+                        CASE
+                            WHEN LOWER(TRIM(unit_type)) = 'apartment' THEN 'Apartment'
+                            WHEN LOWER(TRIM(unit_type)) = 'condo' THEN 'Condo'
+                            WHEN LOWER(TRIM(unit_type)) = 'house' THEN 'House'
+                            WHEN LOWER(TRIM(unit_type)) = 'basement' THEN 'Basement'
+                            WHEN LOWER(TRIM(unit_type)) = 'townhouse' THEN 'Townhouse'
+                            WHEN LOWER(TRIM(unit_type)) = 'duplex/triplex' THEN 'Duplex/Triplex'
+                            ELSE TRIM(unit_type)
+                        END
+                END AS unit_type_clean,
+                scraped_at,
+                description,
                 url  
         FROM rentals_raw) t
     QUALIFY ROW_NUMBER() OVER (PARTITION BY url ORDER BY url) = 1;
