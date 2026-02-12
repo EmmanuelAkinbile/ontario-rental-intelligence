@@ -42,8 +42,11 @@ Using SQL-based transformations and exploratory analysis:
 ## Project Structure
 
 /rental_pipeline.py → Data ingestion + storage
+
 /rental_eda_queries.sql → Analytical SQL queries
+
 /rental_eda.ipynb → Exploratory analysis + interpretation
+
 /kijiji_rentals_clean.csv → Clean analytics-ready dataset (snapshot)
 
 ---
