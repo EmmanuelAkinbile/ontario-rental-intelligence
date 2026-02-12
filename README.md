@@ -41,13 +41,13 @@ Using SQL-based transformations and exploratory analysis:
 
 ## Project Structure
 
-/rental_pipeline.py → Data ingestion + storage
+/[rental_pipeline.py](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/rental_pipeline.py) → Data ingestion + storage
 
-/rental_eda_queries.sql → Analytical SQL queries
+/[rental_eda_queries.sql](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/sql/rental_eda_queries.sql) → Analytical SQL queries
 
-/rental_eda.ipynb → Exploratory analysis + interpretation
+/[rental_eda.ipynb](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/notebooks/rental_eda.ipynb) → Exploratory analysis + interpretation
 
-/kijiji_rentals_clean_sample.csv → Clean analytics-ready dataset (snapshot)
+/[kijiji_rentals_clean_sample.csv](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/data/sample/kijiji_rentals_clean_sample.csv) → Clean analytics-ready dataset (snapshot)
 
 ---
 
