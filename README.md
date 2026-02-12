@@ -47,7 +47,7 @@ Using SQL-based transformations and exploratory analysis:
 
 /rental_eda.ipynb → Exploratory analysis + interpretation
 
-/kijiji_rentals_clean.csv → Clean analytics-ready dataset (snapshot)
+/kijiji_rentals_clean_sample.csv → Clean analytics-ready dataset (snapshot)
 
 ---
 
