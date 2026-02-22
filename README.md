@@ -23,8 +23,8 @@ Using SQL-based transformations and exploratory analysis:
 - Toronto commands the highest median rent and price-per-square-foot
 - Apartments dominate supply in Toronto (~45%), while basements lead in Peel and Durham
 - Price-per-square-foot reveals density-driven premiums in core markets
-- Rent increases non-linearly with bedroom count (clear bedroom premium curve)
 - Inventory mix differs materially across regions, affecting pricing dynamics
+- IQR % of Median functions as a volatility indicator for rent dispersion.
 
 ---
 
@@ -35,20 +35,22 @@ Using SQL-based transformations and exploratory analysis:
 - DuckDB (analytical storage)
 - SQL (data cleaning & transformation layer)
 - Jupyter Notebook (EDA)
+- Power BI (dashboard reporting)
 - GitHub (version control)
 
 ---
 
 ## Project Structure
 
-/[rental_pipeline.py](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/rental_pipeline.py) → Data ingestion + storage
+src/[rental_pipeline.py](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/rental_pipeline.py) → Data ingestion + storage
 
-/[rental_eda_queries.sql](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/sql/rental_eda_queries.sql) → Analytical SQL queries
+sql/[rental_eda_queries.sql](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/sql/rental_eda_queries.sql) → Analytical SQL queries
 
-/[rental_eda.ipynb](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/notebooks/rental_eda.ipynb) → Exploratory analysis + interpretation
+notebooks/[rental_eda.ipynb](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/notebooks/rental_eda.ipynb) → Exploratory analysis + interpretation
 
-/[kijiji_rentals_clean_sample.csv](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/data/sample/kijiji_rentals_clean_sample.csv) → Clean analytics-ready dataset (snapshot)
+data/sample/[kijiji_rentals_clean_sample.csv](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/data/sample/kijiji_rentals_clean_sample.csv) → Clean analytics-ready dataset (snapshot)
 
+powerbi/[ontario_rental_intelligence_report.pbix](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/powerbi/ontario_rental_intelligence_report.pbix) → Power BI report
 ---
 
 ## Data Flow
@@ -59,7 +61,33 @@ Web Pages
 → SQL Transformations  
 → Clean Table  
 → CSV Snapshot  
-→ EDA / BI
+→ Power BI Dashboard
+
+## Power BI Dashboard
+
+The cleaned snapshot dataset powers a two-page analytical report.
+
+### 1. Market Overview
+
+- Median Rent by Region  
+- Median Price per Square Foot  
+- Total Listings Snapshot  
+- Inventory Composition by Unit Type  
+- Bedroom Premium Curve  
+
+![Market Overview](powerbi/overview_page.png)
+
+---
+
+### 2. Market Deep Dive
+
+- Rent Distribution by Bedrooms (P25, Median, P75)
+- Interquartile Range (IQR) and IQR % of Median
+- Median Rent by Unit Type
+- Price per Square Foot by Bedrooms
+- Dynamic Region Filtering via Slicer
+
+![Market Deep Dive](powerbi/market_deep_dive.png)
 
 ---
 
@@ -75,7 +103,8 @@ Web Pages
 
 ## Future Enhancements
 
-- Historical tracking across multiple snapshots
-- Automated anomaly detection
-- Power BI dashboard
-- Regional trend comparison over time
+- Multi-snapshot historical tracking
+- Automated scheduled pipeline execution
+- Expansion to additional Ontario regions
+- Multi-source aggregation (additional rental platforms)
+- Time-series rent trend modeling
