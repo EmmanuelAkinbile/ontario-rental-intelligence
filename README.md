@@ -51,6 +51,7 @@ notebooks/[rental_eda.ipynb](https://github.com/EmmanuelAkinbile/ontario-rental-
 data/sample/[kijiji_rentals_clean_sample.csv](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/data/sample/kijiji_rentals_clean_sample.csv) → Clean analytics-ready dataset (snapshot)
 
 powerbi/[ontario_rental_intelligence_report.pbix](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/powerbi/ontario_rental_intelligence_report.pbix) → Power BI report
+
 ---
 
 ## Data Flow
