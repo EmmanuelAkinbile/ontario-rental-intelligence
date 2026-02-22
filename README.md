@@ -64,6 +64,8 @@ Web Pages
 → CSV Snapshot  
 → Power BI Dashboard
 
+---
+
 ## Power BI Dashboard
 
 The cleaned snapshot dataset powers a two-page analytical report.
