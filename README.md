@@ -1,6 +1,6 @@
 # Ontario Rental Intelligence
 
-An end-to-end data pipeline that collects, cleans, and analyzes live Ontario rental listings to generate market-level housing insights.
+End-to-end rental market intelligence pipeline combining Python ingestion, SQL modeling, and Power BI analytics.
 
 ---
 
