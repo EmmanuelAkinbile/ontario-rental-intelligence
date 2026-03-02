@@ -146,6 +146,7 @@ CREATE OR REPLACE TABLE kijiji_rentals_clean AS
             CASE
                 WHEN price_raw IS NULL THEN NULL
                 WHEN lower(trim(price_raw)) = 'please contact' THEN NULL
+                WHEN lower(trim(price_raw)) = 'swap/trade' THEN NULL
                 ELSE CAST(
                 regexp_replace(
                     regexp_replace(price_raw, '[$,]', '', 'g'),
@@ -286,3 +287,4 @@ WITH (HEADER, DELIMITER ',');
 """)
 
 con.close()
+
