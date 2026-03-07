@@ -1,5 +1,6 @@
 # Ontario Rental Intelligence
 https://app.powerbi.com/reportEmbed?reportId=4b6be5e1-33c0-42c5-bd63-f0cf22ebb57b&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0
+
 End-to-end rental market intelligence pipeline combining Python ingestion, SQL modeling, and Power BI analytics.
 
 ---
