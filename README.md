@@ -38,12 +38,17 @@ Using SQL-based transformations and exploratory analysis:
 - Jupyter Notebook (EDA)
 - Power BI (dashboard reporting)
 - GitHub (version control)
-
+- Power Automate Desktop (automation layer)
+- Windows Task Scheduler (daily scheduling)
+  
 ---
 
 ## Project Structure
 
 src/[rental_pipeline.py](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/rental_pipeline.py) → Data ingestion + storage
+
+src/[run_rental_pipeline.bat](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/run_rental_pipeline.bat) → Runner script, chains pipeline and update scripts, logs each run
+src/[update_rental_latest.py](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/src/update_rental_latest.py) → Copies today's clean CSV to kijiji_rentals_clean_latest.csv for Power BI
 
 sql/[rental_eda_queries.sql](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence/blob/main/sql/rental_eda_queries.sql) → Analytical SQL queries
 
@@ -63,7 +68,9 @@ Web Pages
 → SQL Transformations  
 → Clean Table  
 → CSV Snapshot  
-→ Power BI Dashboard
+→ update_rental_latest.py (latest snapshot copy)
+→ OneDrive Sync (automatic cloud sync)
+→ Power BI Dashboard (auto-refreshes daily)
 
 ---
 
@@ -108,7 +115,6 @@ The cleaned snapshot dataset powers a two-page analytical report.
 ## Future Enhancements
 
 - Multi-snapshot historical tracking
-- Automated scheduled pipeline execution
 - Expansion to additional Ontario regions
 - Multi-source aggregation (additional rental platforms)
 - Time-series rent trend modeling
